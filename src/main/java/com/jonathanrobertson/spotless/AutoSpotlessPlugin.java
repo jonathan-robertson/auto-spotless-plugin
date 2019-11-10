@@ -5,6 +5,7 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.PluginContainer;
 
+import java.net.URL;
 import java.util.Optional;
 
 public class AutoSpotlessPlugin implements Plugin<Project> {
@@ -15,14 +16,15 @@ public class AutoSpotlessPlugin implements Plugin<Project> {
 
     }
 
-    /**
-     * Find and return SpotlessPlugin instance; attaching a new instance if necessary
-     * @param project current project
-     * @return {@link SpotlessPlugin}
-     */
     private SpotlessPlugin getOrAttachSpotlessPlugin(Project project) {
         PluginContainer pluginContainer = project.getPlugins();
         return Optional.ofNullable(pluginContainer.findPlugin(SpotlessPlugin.class))
                 .orElseGet(() -> pluginContainer.apply(SpotlessPlugin.class));
+    }
+
+    private String getExternalPath(String filename) {
+        return Optional.ofNullable(this.getClass().getClassLoader().getResource(filename))
+                .map(URL::toExternalForm)
+                .orElseThrow(() -> new RuntimeException(filename + " could not be detected in AutoSpotlessPlugin"));
     }
 }
