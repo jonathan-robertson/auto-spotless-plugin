@@ -14,6 +14,11 @@ public class AutoSpotlessPlugin implements Plugin<Project> {
     public void apply(Project project) {
         SpotlessPlugin spotlessPlugin = getOrAttachSpotlessPlugin(project);
 
+        spotlessPlugin.getExtension().java(format -> {
+            format.removeUnusedImports();
+            format.importOrder(getExternalPath("spotless.importorder"));
+            format.eclipse().configFile(getExternalPath("spotless.eclipseformat.xml"));
+        });
     }
 
     private SpotlessPlugin getOrAttachSpotlessPlugin(Project project) {
