@@ -5,7 +5,11 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.PluginContainer;
 
-import java.net.URL;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 
 public class AutoSpotlessPlugin implements Plugin<Project> {
@@ -16,8 +20,8 @@ public class AutoSpotlessPlugin implements Plugin<Project> {
 
         spotlessPlugin.getExtension().java(format -> {
             format.removeUnusedImports();
-            format.importOrder(getExternalPath("spotless.importorder"));
-            format.eclipse().configFile(getExternalPath("spotless.eclipseformat.xml"));
+            format.importOrderFile(getAbsolutePathFromEmbeddedFile("spotless.importorder"));
+            format.eclipse().configFile(getAbsolutePathFromEmbeddedFile("spotless.eclipseformat.xml"));
         });
     }
 
@@ -27,9 +31,13 @@ public class AutoSpotlessPlugin implements Plugin<Project> {
                 .orElseGet(() -> pluginContainer.apply(SpotlessPlugin.class));
     }
 
-    private String getExternalPath(String filename) {
-        return Optional.ofNullable(this.getClass().getClassLoader().getResource(filename))
-                .map(URL::toExternalForm)
-                .orElseThrow(() -> new RuntimeException(filename + " could not be detected in AutoSpotlessPlugin"));
+    protected static File getAbsolutePathFromEmbeddedFile(String filename) {
+        File target = new File(System.getProperty("java.io.tmpdir"), filename);
+        try (InputStream is = AutoSpotlessPlugin.class.getClassLoader().getResourceAsStream(filename)) {
+            Files.copy(is, target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (NullPointerException | IOException e) {
+            throw new RuntimeException("unable to find " + filename + " in AutoSpotlessPlugin", e);
+        }
+        return target;
     }
 }
