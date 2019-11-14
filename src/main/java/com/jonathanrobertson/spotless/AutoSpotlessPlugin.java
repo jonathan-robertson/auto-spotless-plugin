@@ -18,7 +18,11 @@ public class AutoSpotlessPlugin implements Plugin<Project> {
 
 	@Override
 	public void apply(Project project) {
-		SpotlessExtension spotlessExtension = getOrAttachSpotlessPlugin(project).getExtension();
+		PluginContainer pluginContainer = project.getPlugins();
+		SpotlessExtension spotlessExtension = Optional
+				.ofNullable(pluginContainer.findPlugin(SpotlessPlugin.class))
+				.orElseGet(() -> pluginContainer.apply(SpotlessPlugin.class))
+				.getExtension();
 
 		spotlessExtension.java(format -> {
 			format.removeUnusedImports();
@@ -38,12 +42,6 @@ public class AutoSpotlessPlugin implements Plugin<Project> {
 			format.target("**/*.gradle");
 			format.replaceRegex("blank lines following {", "\\{\\n\\s*\\n+", "{\n");
 		});
-	}
-
-	private SpotlessPlugin getOrAttachSpotlessPlugin(Project project) {
-		PluginContainer pluginContainer = project.getPlugins();
-		return Optional.ofNullable(pluginContainer.findPlugin(SpotlessPlugin.class))
-				.orElseGet(() -> pluginContainer.apply(SpotlessPlugin.class));
 	}
 
 	protected static File getAbsolutePathFromEmbeddedFile(String filename) {
