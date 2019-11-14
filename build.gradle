@@ -1,26 +1,42 @@
 plugins {
     id 'java-gradle-plugin'
     id 'maven-publish'
+    id 'com.diffplug.gradle.spotless' version '3.26.0' // spotless formatting for this program
 }
-
-group 'com.jonathanrobertson.spotless'
-version '0.0.1-SNAPSHOT'
-
-sourceCompatibility = 1.8
 
 project.description = 'Preconfigured spotless configuration and gradle tasks for use in other projects'
 project.group = 'com.jonathanrobertson.spotless'
-project.version = '0.0.1-SNAPSHOT'
+project.version = '1.0.0'
 
 project.ext.name = 'auto-spotless-plugin'
 project.ext.pluginId = 'com.jonathanrobertson.spotless.AutoSpotlessPlugin'
+
+sourceCompatibility = 1.8
+
+spotless {
+    java {
+        removeUnusedImports()
+        importOrderFile('src/main/resources/spotless.importorder')
+        eclipse().configFile('src/main/resources/spotless.eclipseformat.xml')
+    }
+    format 'misc', {
+        target '**/*.md', '**/*.gradle', '**/.gitignore'
+        trimTrailingWhitespace()
+        endWithNewline()
+        replaceRegex 'too many blank lines', '^\\n\\n+', '\n'
+    }
+    format 'gradle', {
+        target '**/*.gradle'
+        replaceRegex 'blank lines following {', '\\{\\n\\s*\\n+', '{\n'
+    }
+}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compile 'com.diffplug.spotless:spotless-plugin-gradle:3.25.0'
+    compile 'com.diffplug.spotless:spotless-plugin-gradle:3.26.0' // spotless formatting for other programs
 
     testCompile 'junit:junit:4.12'
 }

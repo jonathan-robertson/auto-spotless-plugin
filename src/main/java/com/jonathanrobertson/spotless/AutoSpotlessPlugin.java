@@ -1,28 +1,56 @@
 package com.jonathanrobertson.spotless;
 
-import com.diffplug.gradle.spotless.SpotlessPlugin;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.Optional;
+
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.PluginContainer;
 
-import java.util.Optional;
+import com.diffplug.gradle.spotless.SpotlessExtension;
+import com.diffplug.gradle.spotless.SpotlessPlugin;
 
 public class AutoSpotlessPlugin implements Plugin<Project> {
 
-    @Override
-    public void apply(Project project) {
-        SpotlessPlugin spotlessPlugin = getOrAttachSpotlessPlugin(project);
+	@Override
+	public void apply(Project project) {
+		PluginContainer pluginContainer = project.getPlugins();
+		SpotlessExtension spotlessExtension = Optional
+				.ofNullable(pluginContainer.findPlugin(SpotlessPlugin.class))
+				.orElseGet(() -> pluginContainer.apply(SpotlessPlugin.class))
+				.getExtension();
 
-    }
+		spotlessExtension.java(format -> {
+			format.removeUnusedImports();
+			format.importOrderFile(getAbsolutePathFromEmbeddedFile("spotless.importorder"));
+			format.eclipse().configFile(getAbsolutePathFromEmbeddedFile("spotless.eclipseformat.xml"));
+		});
 
-    /**
-     * Find and return SpotlessPlugin instance; attaching a new instance if necessary
-     * @param project current project
-     * @return {@link SpotlessPlugin}
-     */
-    private SpotlessPlugin getOrAttachSpotlessPlugin(Project project) {
-        PluginContainer pluginContainer = project.getPlugins();
-        return Optional.ofNullable(pluginContainer.findPlugin(SpotlessPlugin.class))
-                .orElseGet(() -> pluginContainer.apply(SpotlessPlugin.class));
-    }
+		spotlessExtension.format("misc", format -> {
+			format.target("**/*.md", "**/*.gradle", "**/.gitignore");
+			format.trimTrailingWhitespace();
+			format.endWithNewline();
+
+			format.replaceRegex("too many blank lines", "^\\n\\n+", "\n");
+		});
+
+		spotlessExtension.format("gradle", format -> {
+			format.target("**/*.gradle");
+			format.replaceRegex("blank lines following {", "\\{\\n\\s*\\n+", "{\n");
+		});
+	}
+
+	protected static File getAbsolutePathFromEmbeddedFile(String filename) {
+		File target = new File(System.getProperty("java.io.tmpdir"), filename);
+		try (InputStream is = AutoSpotlessPlugin.class.getClassLoader().getResourceAsStream(filename)) {
+			Files.copy(is, target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		} catch (NullPointerException | IOException e) {
+			throw new RuntimeException("unable to find " + filename + " in AutoSpotlessPlugin", e);
+		}
+		return target;
+	}
 }
