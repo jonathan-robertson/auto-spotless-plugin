@@ -4,6 +4,15 @@ plugins {
     id 'com.diffplug.gradle.spotless' version '3.26.0' // spotless formatting for this program
 }
 
+project.description = 'Preconfigured spotless configuration and gradle tasks for use in other projects'
+project.group = 'com.jonathanrobertson.spotless'
+project.version = '1.0.0'
+
+project.ext.name = 'auto-spotless-plugin'
+project.ext.pluginId = 'com.jonathanrobertson.spotless.AutoSpotlessPlugin'
+
+sourceCompatibility = 1.8
+
 spotless {
     java {
         removeUnusedImports()
@@ -21,15 +30,6 @@ spotless {
         replaceRegex 'blank lines following {', '\\{\\n\\s*\\n+', '{\n'
     }
 }
-
-sourceCompatibility = 1.8
-
-project.description = 'Preconfigured spotless configuration and gradle tasks for use in other projects'
-project.group = 'com.jonathanrobertson.spotless'
-project.version = '0.3.0-SNAPSHOT'
-
-project.ext.name = 'auto-spotless-plugin'
-project.ext.pluginId = 'com.jonathanrobertson.spotless.AutoSpotlessPlugin'
 
 repositories {
     mavenCentral()
