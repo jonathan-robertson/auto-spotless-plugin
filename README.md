@@ -13,15 +13,19 @@ Simply include this plugin in your `build.gradle` by following [this guide](http
     - `.gradle`
     - `.md`
     - `.gitignore`
+    - `.yml`/`.yaml`
 
 ## Usage
-You'd use this in the same way that you'd use Spotless directly, just without the need to add your own configuration.
+So after setting up, you can approach usage in a few different ways:
 
-So after setting up, you can run `./gradlew build` and will be faced with error messages (preventing build) unless your code passes the formatting requirements.
+- You can take the same steps you'd normally take or encounter with Spotless:
+    1. Run `./gradlew build` and will be faced with error messages (preventing build) if your code passes does not pass the formatting requirements.
+    1. If you got an error, run `./gradlew spotlessApply build` to format your project files automatically and retry the build.
+- Or you can add a shortcut to make things a *little* more automated:
+    1. Set the environment variable `AUTO_SPOTLESS_ENV` to `dev` if you don't like manually writing `spotlessApply`. This will cause the `build` task to trigger `spotlessApply` for you automatically any time it is run.
+    1. Be sure to check for formatting changes. A reminder for this will appear as well as the output of `git status -s -uno` (if you're in a git repository) to show what's changed in your tracked files (hopefully this helps to speed things up for you).
 
-Run `./gradlew spotlessApply` to format your project files automatically and then your build should work again.
-
-*TODO: I have plans to automatically trigger the `spotlessApply` task if a certain environment variable is set, but that will be added for the `v1.1.0` release.*
+## Etc
 
 ### Why does this exist?
 As with many things, I was trying to find/build a centralized package to enforce formatting styles on my personal projects without having to copy/paste over all the configs each time.
