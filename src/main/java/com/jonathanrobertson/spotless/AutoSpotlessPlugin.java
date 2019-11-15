@@ -10,7 +10,9 @@ import java.util.Optional;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.Task;
 import org.gradle.api.plugins.PluginContainer;
+import org.gradle.api.tasks.TaskContainer;
 
 import com.diffplug.gradle.spotless.SpotlessExtension;
 import com.diffplug.gradle.spotless.SpotlessPlugin;
@@ -43,16 +45,37 @@ public class AutoSpotlessPlugin implements Plugin<Project> {
 			format.target("**/*.gradle");
 			format.replaceRegex("blank lines following {", "\\{\\n\\s*\\n+", "{\n");
 		});
+
+		if ("dev".equals(System.getenv("AUTO_SPOTLESS_ENV"))) {
+			TaskContainer taskContainer = project.getTasks();
+			Task build = taskContainer.getByName("build");
+			build.dependsOn("spotlessApply");
+
+			Task autoFormatWarning = taskContainer.create("autoFormatWarning", AutoFormatWarningTask.class);
+			build.finalizedBy(autoFormatWarning);
+
+			if (gitIsPresent()) {
+				Task gitStatus = taskContainer.create("gitStatus", GitStatusTask.class);
+				autoFormatWarning.finalizedBy(gitStatus);
+			}
+		}
 	}
 
 	protected static File getAbsolutePathFromEmbeddedFile(String filename) {
 		File target = new File(System.getProperty("java.io.tmpdir"), filename);
 		try (InputStream is = AutoSpotlessPlugin.class.getClassLoader().getResourceAsStream(filename)) {
-			Objects.requireNonNull(is);
-			Files.copy(is, target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(Objects.requireNonNull(is), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (NullPointerException | IOException e) {
 			throw new RuntimeException("unable to find " + filename + " in AutoSpotlessPlugin", e);
 		}
 		return target;
+	}
+
+	protected static boolean gitIsPresent() {
+		try {
+			return new ProcessBuilder("git", "status").start().waitFor() == 0;
+		} catch (IOException | InterruptedException e) {
+			return false;
+		}
 	}
 }
