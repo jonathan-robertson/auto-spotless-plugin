@@ -2,6 +2,7 @@ plugins {
     id 'java-gradle-plugin'
     id 'maven-publish'
     id 'com.diffplug.gradle.spotless' version '3.26.0' // spotless formatting for this program
+    id 'com.gradle.plugin-publish' version '0.10.1'
 }
 
 project.description = 'Preconfigured spotless configuration and gradle tasks for use in other projects'
@@ -9,7 +10,8 @@ project.group = 'com.jonathanrobertson.spotless'
 project.version = '1.0.0'
 
 project.ext.name = 'auto-spotless-plugin'
-project.ext.pluginId = 'com.jonathanrobertson.spotless.AutoSpotlessPlugin'
+project.ext.pluginId = 'com.jonathanrobertson.spotless'
+project.ext.implementationClass = 'com.jonathanrobertson.spotless.AutoSpotlessPlugin'
 
 sourceCompatibility = 1.8
 
@@ -41,16 +43,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-// ref: java-gradle-plugin
-gradlePlugin {
-    plugins {
-        autoSpotlessPlugin {
-            id = project.ext.pluginId
-            implementationClass = project.ext.pluginId
-        }
-    }
-}
-
 // ref: maven-publish
 publishing {
     publications {
@@ -59,6 +51,25 @@ publishing {
             groupId project.group
             artifactId project.ext.name
             version project.version
+        }
+    }
+}
+
+// ref: com.gradle.plugin-publish
+pluginBundle {
+    website = 'https://github.com/jonathan-robertson/auto-spotless-plugin'
+    vcsUrl = 'https://github.com/jonathan-robertson/auto-spotless-plugin'
+    tags = ['spotless', 'configuration', 'style', 'format']
+}
+
+// ref: java-gradle-plugin
+gradlePlugin {
+    plugins {
+        autoSpotlessPlugin {
+            id = project.ext.pluginId
+            displayName = project.ext.name
+            description = project.description
+            implementationClass = project.ext.implementationClass
         }
     }
 }
