@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.gradle.api.Plugin;
@@ -47,6 +48,7 @@ public class AutoSpotlessPlugin implements Plugin<Project> {
 	protected static File getAbsolutePathFromEmbeddedFile(String filename) {
 		File target = new File(System.getProperty("java.io.tmpdir"), filename);
 		try (InputStream is = AutoSpotlessPlugin.class.getClassLoader().getResourceAsStream(filename)) {
+			Objects.requireNonNull(is);
 			Files.copy(is, target.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (NullPointerException | IOException e) {
 			throw new RuntimeException("unable to find " + filename + " in AutoSpotlessPlugin", e);
