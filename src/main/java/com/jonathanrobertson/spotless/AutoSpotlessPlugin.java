@@ -32,7 +32,7 @@ public class AutoSpotlessPlugin implements Plugin<Project> {
 		});
 
 		spotlessExtension.format("misc", format -> {
-			format.target("**/*.md", "**/*.gradle", "**/.gitignore");
+			format.target("**/*.md", "**/*.gradle", "**/.gitignore", "**/*.yml", "**/*.yaml");
 			format.trimTrailingWhitespace();
 			format.endWithNewline();
 
@@ -48,7 +48,7 @@ public class AutoSpotlessPlugin implements Plugin<Project> {
 	protected static File getAbsolutePathFromEmbeddedFile(String filename) {
 		File target = new File(System.getProperty("java.io.tmpdir"), filename);
 		try (InputStream is = AutoSpotlessPlugin.class.getClassLoader().getResourceAsStream(filename)) {
-            Objects.requireNonNull(is);
+			Objects.requireNonNull(is);
 			Files.copy(is, target.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (NullPointerException | IOException e) {
 			throw new RuntimeException("unable to find " + filename + " in AutoSpotlessPlugin", e);
