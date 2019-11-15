@@ -32,7 +32,7 @@ public class AutoSpotlessPlugin implements Plugin<Project> {
 		});
 
 		spotlessExtension.format("misc", format -> {
-			format.target("**/*.md", "**/*.gradle", "**/.gitignore");
+			format.target("**/*.md", "**/*.gradle", "**/.gitignore", "**/*.yml", "**/*.yaml");
 			format.trimTrailingWhitespace();
 			format.endWithNewline();
 

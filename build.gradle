@@ -22,7 +22,7 @@ spotless {
         eclipse().configFile('src/main/resources/spotless.eclipseformat.xml')
     }
     format 'misc', {
-        target '**/*.md', '**/*.gradle', '**/.gitignore'
+        target '**/*.md', '**/*.gradle', '**/.gitignore', '**/*.yml', '**/*.yaml'
         trimTrailingWhitespace()
         endWithNewline()
         replaceRegex 'too many blank lines', '^\\n\\n+', '\n'
