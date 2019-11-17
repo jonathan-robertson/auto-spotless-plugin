@@ -7,7 +7,7 @@ plugins {
 
 project.description = 'Preconfigured spotless configuration and gradle tasks for use in other projects'
 project.group = 'com.jonathanrobertson.spotless'
-project.version = '1.1.0'
+project.version = '1.1.1'
 
 project.ext.name = 'auto-spotless-plugin'
 project.ext.pluginId = 'com.jonathanrobertson.spotless'
