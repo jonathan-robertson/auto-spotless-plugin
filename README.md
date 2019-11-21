@@ -1,4 +1,6 @@
 # Auto Spotless Plugin
+![](https://github.com/jonathan-robertson/auto-spotless-plugin/workflows/build/badge.svg) ![](https://github.com/jonathan-robertson/auto-spotless-plugin/workflows/publish%20plugin/badge.svg)
+
 *A Spotless Wrapper with embedded configuration*
 
 ## Setup
