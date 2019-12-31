@@ -20,12 +20,14 @@ Simply include this plugin in your `build.gradle` by following [this guide](http
 ## Usage
 So after setting up, you can approach usage in a few different ways:
 
-- You can take the same steps you'd normally take or encounter with Spotless:
+- I only want the benefit of the Spotless configuration and do not want anything happening automatically for me:
     1. Run `./gradlew build` and will be faced with error messages (preventing build) if your code passes does not pass the formatting requirements.
     1. If you got an error, run `./gradlew spotlessApply build` to format your project files automatically and retry the build.
-- Or you can add a shortcut to make things a *little* more automated:
-    1. Set the environment variable `AUTO_SPOTLESS_ENV` to `dev` if you don't like manually writing `spotlessApply`. This will cause the `build` task to trigger `spotlessApply` for you automatically any time it is run.
-    1. Be sure to check for formatting changes. A reminder for this will appear as well as the output of `git status -s -uno` (if you're in a git repository) to show what's changed in your tracked files (hopefully this helps to speed things up for you).
+- I want to use Spotless and this configuration **and also** want `spotlessApply` to be run automatically on build:
+    1. Set the environment variable `AUTO_SPOTLESS_ENV` to `dev`. This will cause the `build` task to trigger `spotlessApply` for you automatically any time it is run.
+    1. If any files were changed, you will get a `WARNING` indicator with an explanation of exactly which of your tracked files were changed (`git diff --stat` output).
+        - NOTE 1: untracked files may been changed as well during this process (just like with running `spotlessApply` directly), but these are not included in the post-analysis since you aren't tracking them... they are not expected to interrupt your push and therefore do not need reminders (or at least that makes sense for me).
+        - NOTE 2: I don't recommend using `spotlessApply` directly if you have `AUTO_SPOTLESS_ENV` set to `dev` since it will assume all untracked changes (even pre-existing ones) were caused by Spotless. Other than that, there is no harm in running them separately.
 
 ## Etc
 
