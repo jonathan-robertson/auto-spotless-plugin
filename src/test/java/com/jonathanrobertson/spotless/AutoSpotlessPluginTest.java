@@ -19,9 +19,4 @@ public class AutoSpotlessPluginTest {
 			Assert.assertEquals(expected, actual);
 		});
 	}
-
-	@Test
-	public void gitIsPresent() {
-		AutoSpotlessPlugin.gitIsPresent(); // just confirm an unexpected exception doesn't appear
-	}
 }
